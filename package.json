@@ -1,5 +1,5 @@
 {
-	"name": "better-stack",
+	"name": "tutorflow",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
@@ -11,7 +11,7 @@
 		"server:build": "bun build ./server/index.ts --outfile ./dist/server.js",
 		"server:dev": "bun run --hot --port 4000 ./server/index.ts",
 		"server:start": "bun run dist/server.js",
-		"server:wrangler": "wrangler dev --config=dev.wrangler.jsonc --port=4000 --test-scheduled",
+		"server:wrangler": "wrangler dev --port=4000 --test-scheduled",
 		"server:open": "bun run server:wrangler --ip=0.0.0.0",
 		"web:build": "next build",
 		"web:dev": "next dev --turbopack --port=3000",
@@ -24,7 +24,6 @@
 		"build": "bun run web:build"
 	},
 	"dependencies": {
-		"@libsql/client": "^0.14.0",
 		"@mdx-js/loader": "^3.1.1",
 		"@mdx-js/react": "^3.1.1",
 		"@next/mdx": "^16.2.9",

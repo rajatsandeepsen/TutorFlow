@@ -1,8 +1,12 @@
-import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import type { D1Database } from "typeflare";
+import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { type SchemaType, schema } from "./schema";
+import { env } from "@/lib/env";
 
-export const createDB = (db: D1Database) => drizzle(db, { schema });
+export const createDB = () => {
+	const client = postgres(env.DATABASE_URL, { prepare: false });
+	return drizzle(client, { schema });
+};
 
-export type DATABASE = DrizzleD1Database<SchemaType>;
+export type DATABASE = PostgresJsDatabase<SchemaType>;
 export type CreatedDB = ReturnType<typeof createDB>;

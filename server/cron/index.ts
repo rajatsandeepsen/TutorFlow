@@ -3,6 +3,7 @@ import { triedAsync } from "@/lib/tools";
 import { createDB } from "../db";
 import type { HonoType } from "../types";
 import { createCronVar } from "./utils";
+import { env } from "@/lib/env";
 
 const cron = new Cron<HonoType>();
 
@@ -16,8 +17,6 @@ cron.use(
 		};
 	}),
 );
-
-cron.use(createCronVar("db", (c) => createDB(c.env.DATABASE)));
 
 cron.schedule("30 6 * * *", async (c) => {
 	console.log("Cron Working");

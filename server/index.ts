@@ -41,12 +41,12 @@ app.use(
 	}),
 );
 
-app.use(createVar("db", (c) => createDB(c.env.DATABASE)));
+app.use(createVar("db", (c) => createDB()));
 
 app.use(
 	createVar("auth", (c) => {
 		const baseURL = new URL(c.req.url).origin;
-		return createAuth(c.var.db, baseURL, c.var.waitUntil);
+		return createAuth(baseURL, c.var.waitUntil);
 	}),
 );
 

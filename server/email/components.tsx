@@ -1,5 +1,5 @@
 import { type ButtonProps, Button as EButton } from "@react-email/components";
-import cn from "cnfast";
+import { cn } from "cn";
 
 export const Button = ({
 	varient,

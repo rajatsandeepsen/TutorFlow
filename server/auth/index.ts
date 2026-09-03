@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { env } from "env";
-import type { CreatedDB } from "@/server/db";
+import { createDB, type CreatedDB } from "@/server/db";
 import { schema } from "@/server/db/schema";
 import type { WaitUntil } from "../types";
 
@@ -10,7 +10,6 @@ export const trustedOrigins = [env.CORS_ORIGIN ?? ""].filter(
 );
 
 export const createAuth = (
-	db: CreatedDB,
 	baseURL: string,
 	waitUntil: WaitUntil,
 ) =>
@@ -24,20 +23,12 @@ export const createAuth = (
 			},
 		},
 		trustedOrigins,
-		database: drizzleAdapter(db, {
+		database: drizzleAdapter(createDB(), {
 			provider: "pg",
-			// provider: "sqlite",
 			schema,
 		}),
 		emailAndPassword: {
 			enabled: true,
-		},
-		socialProviders: {
-			google: {
-				prompt: "select_account",
-				clientId: env.GOOGLE_CLIENT_ID,
-				clientSecret: env.GOOGLE_CLIENT_SECRET,
-			},
 		},
 
 		onAPIError: {

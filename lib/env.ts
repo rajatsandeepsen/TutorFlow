@@ -11,20 +11,13 @@ export const env = createEnv({
 		AUTH_URL: z.string().url().optional(),
 		CORS_ORIGIN: z.string().url().optional(),
 
-		GOOGLE_CLIENT_ID: z.string(),
-		GOOGLE_CLIENT_SECRET: z.string(),
-
 		// UPSTASH_REDIS_URL: z.string().url(),
 		// UPSTASH_REDIS_TOKEN: z.string(),
 
 		// NODEMAILER_EMAIL: z.string().email(),
 		// NODEMAILER_PASS: z.string(),
 
-		// BUCKET_ENDPOINT: z.string().url(),
-		// BUCKET_ACCESS_KEY_ID: z.string(),
-		// BUCKET_ACCESS_KEY_SECRET: z.string(),
-
-		// BUCKET_PUBLIC_URL: z.string().url(),
+		DATABASE_URL: z.string(),
 
 		NODE_ENV: z
 			.enum(["development", "test", "production"])
@@ -49,19 +42,13 @@ export const env = createEnv({
 		AUTH_URL: process.env.AUTH_URL,
 		CORS_ORIGIN: process.env.CORS_ORIGIN,
 
-		GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-		GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-
 		// UPSTASH_REDIS_URL: env.UPSTASH_REDIS_URL,
 		// UPSTASH_REDIS_TOKEN: env.UPSTASH_REDIS_TOKEN,
 
 		// NODEMAILER_EMAIL: env.NODEMAILER_EMAIL,
 		// NODEMAILER_PASS: env.NODEMAILER_PASS,
 
-		// BUCKET_ENDPOINT: env.BUCKET_ENDPOINT,
-		// BUCKET_ACCESS_KEY_ID: env.BUCKET_ACCESS_KEY_ID,
-		// BUCKET_ACCESS_KEY_SECRET: env.BUCKET_ACCESS_KEY_SECRET,
-		// BUCKET_PUBLIC_URL: env.BUCKET_PUBLIC_URL,
+		DATABASE_URL: process.env.DATABASE_URL,
 
 		NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
 
