@@ -15,7 +15,7 @@ export const env = createEnv({
 		// UPSTASH_REDIS_TOKEN: z.string(),
 
 		// NODEMAILER_EMAIL: z.string().email(),
-		// NODEMAILER_PASS: z.string(),
+		NODEMAILER_PASS: z.string(),
 
 		DATABASE_URL: z.string(),
 
@@ -45,8 +45,7 @@ export const env = createEnv({
 		// UPSTASH_REDIS_URL: env.UPSTASH_REDIS_URL,
 		// UPSTASH_REDIS_TOKEN: env.UPSTASH_REDIS_TOKEN,
 
-		// NODEMAILER_EMAIL: env.NODEMAILER_EMAIL,
-		// NODEMAILER_PASS: env.NODEMAILER_PASS,
+		NODEMAILER_PASS: process.env.NODEMAILER_PASS,
 
 		DATABASE_URL: process.env.DATABASE_URL,
 

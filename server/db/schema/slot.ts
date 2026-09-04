@@ -2,34 +2,34 @@ import { sql } from "drizzle-orm";
 import {
 	index,
 	integer,
-	numeric,
 	pgEnum,
 	pgTable,
 	text,
 	timestamp,
-	uuid,
 } from "drizzle-orm/pg-core";
 import type { CreatedDB } from "..";
-import { createdAt, updatedAt } from "../utils";
+import { createdAt, generateId, updatedAt } from "../utils";
 import { user } from "./auth";
 
 export const slotStatusEnum = pgEnum("slot_status", [
 	"pending",
 	"confirmed",
+	"in_progress",
 	"cancelled",
 	"rejected",
 	"expired",
+	"attended",
 ]);
 
 export const slot = pgTable(
 	"slot",
 	{
-		id: uuid("id").primaryKey().defaultRandom(),
+		id: generateId("id").primaryKey(),
 
-		teacherId: uuid("teacher_id")
+		teacherId: text("teacher_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		studentId: uuid("student_id")
+		studentId: text("student_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 
@@ -42,8 +42,8 @@ export const slot = pgTable(
 			mode: "date",
 		}).notNull(),
 
-		count: integer().default(1),
-		title: text("title"),
+		count: integer("count").notNull().default(1),
+		topic: text("topic").notNull(),
 		description: text("description"),
 		status: slotStatusEnum("status").notNull().default("pending"),
 
@@ -52,10 +52,10 @@ export const slot = pgTable(
 	},
 
 	(table) => [
-		// Ensure start <= end
-		sql`CHECK (${table.startTime} <= ${table.endTime})`,
+		// Ensure a real interval
+		sql`CHECK (${table.startTime} < ${table.endTime})`,
 
-		// Index to speed up availability searches
+		// Index to speed up tutor schedule lookups
 		index("slot_teacher_status_time_idx").on(
 			table.teacherId,
 			table.status,
@@ -65,14 +65,16 @@ export const slot = pgTable(
 	],
 );
 
-// No two rows with the same teacher_id can have overlapping [start_time, end_time) when status = 'confirmed'
-export async function enableConstrain(db: CreatedDB) {
+// No overlapping active sessions for the same tutor
+export async function enableConstraint(db: CreatedDB) {
+	await db.execute(sql`CREATE EXTENSION IF NOT EXISTS btree_gist;`);
+
 	await db.execute(sql`
-	ALTER TABLE slot ADD CONSTRAINT slot_no_overlap_confirmed
+	ALTER TABLE slot ADD CONSTRAINT slot_no_overlap_teacher_active
 		EXCLUDE USING GIST (
 			teacher_id WITH =,
 			tstzrange(start_time, end_time, '[)') WITH &&
 		)
-		WHERE (status = 'confirmed');
+		WHERE (status IN ('pending', 'confirmed', 'in_progress'));
 	`);
 }

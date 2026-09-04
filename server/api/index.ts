@@ -1,4 +1,6 @@
 import { protectedProcedure, publicProcedure } from "./procedure";
+import { studentRouter } from "./student";
+import { teacherRouter } from "./teacher";
 
 export const appRouter = {
 	healthCheck: publicProcedure.handler(() => {
@@ -10,5 +12,7 @@ export const appRouter = {
 			user: context.session?.user,
 		};
 	}),
+	teacher: teacherRouter,
+	student: studentRouter,
 };
 export type AppRouter = typeof appRouter;

@@ -1,6 +1,8 @@
 import { ORPCError, type ORPCErrorCode } from "@orpc/client";
 import { os } from "@orpc/server";
+import { eq } from "drizzle-orm";
 import { triedAsync, tryAsync } from "@/lib/tools";
+import { user } from "@/server/db/schema/auth";
 import type { StaticContextORPC } from "./context";
 
 export const getError = (
@@ -48,11 +50,47 @@ export const protectedProcedure = publicProcedure.use(
 				"You are not authorized to access this action",
 			);
 
+		const dbUser = await tryAPI(
+			"procedure.protectedProcedure.findUserBySession",
+			context.db.query.user.findFirst({
+				where: eq(user.id, session.user.id),
+			}),
+		);
+
+		if (!dbUser)
+			throw getError("UNAUTHORIZED", "User account not found in database");
+
 		return next({
 			context: {
 				session: session,
-				user: session.user,
+				user: dbUser,
 			},
 		});
+	},
+);
+
+export const teacherProcedure = protectedProcedure.use(
+	async ({ context, next }) => {
+		if (context.user.role !== "teacher") {
+			throw getError(
+				"FORBIDDEN",
+				"Only teachers are allowed to access this action",
+			);
+		}
+
+		return next({ context });
+	},
+);
+
+export const studentProcedure = protectedProcedure.use(
+	async ({ context, next }) => {
+		if (context.user.role !== "student") {
+			throw getError(
+				"FORBIDDEN",
+				"Only students are allowed to access this action",
+			);
+		}
+
+		return next({ context });
 	},
 );
