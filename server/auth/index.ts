@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { env } from "env";
-import { createDB, type CreatedDB } from "@/server/db";
+import { createDB } from "@/server/db";
 import { schema } from "@/server/db/schema";
 import type { WaitUntil } from "../types";
 
@@ -9,10 +9,7 @@ export const trustedOrigins = [env.CORS_ORIGIN ?? ""].filter(
 	(o) => o.length > 0,
 );
 
-export const createAuth = (
-	baseURL: string,
-	waitUntil: WaitUntil,
-) =>
+export const createAuth = (baseURL: string, waitUntil: WaitUntil) =>
 	betterAuth({
 		secret: env.AUTH_SECRET,
 		baseURL,
@@ -30,9 +27,24 @@ export const createAuth = (
 		emailAndPassword: {
 			enabled: true,
 		},
-
+		user: {
+			deleteUser: {
+				enabled: true,
+			},
+			additionalFields: {
+				role: {
+					type: ["student", "teacher"],
+					required: true,
+					defaultValue: "teacher",
+					input: false,
+				},
+			},
+		},
 		onAPIError: {
 			errorURL: "/error",
+			onError: (error) => {
+				console.error("Auth Error:", error);
+			},
 		},
 		plugins: [],
 	});
