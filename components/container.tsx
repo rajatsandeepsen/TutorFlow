@@ -37,7 +37,14 @@ export const CenterContainer = ({
 				containerClassName,
 			)}
 		>
-			<div className={cn("min-w-sm md:min-w-md lg:w-lg xl:w-xl 2xl:w-2xl", className)}>{children}</div>
+			<div
+				className={cn(
+					"min-w-sm md:min-w-md lg:w-lg xl:w-xl 2xl:w-2xl",
+					className,
+				)}
+			>
+				{children}
+			</div>
 		</div>
 	);
 };

@@ -9,6 +9,9 @@ export const studentProfile = pgTable(
 		studentId: text("student_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
+		teacherId: text("teacher_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
 		name: text("name").notNull(),
 		subject: text("subject").notNull(),
 		currentLevel: text("current_level").notNull(),

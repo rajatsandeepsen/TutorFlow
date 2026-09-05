@@ -25,7 +25,7 @@ const withTime = (offsetDays: number, hour: number, minute: number) => {
 	return value;
 };
 
-const initialBookedSlots: BookedSlot[] = [
+const initialBookedSlots: Omit<BookedSlot, "user">[] = [
 	{ startTime: withTime(0, 10, 0), endTime: withTime(0, 11, 0) },
 	{ startTime: withTime(0, 14, 30), endTime: withTime(0, 15, 15) },
 	{ startTime: withTime(1, 9, 30), endTime: withTime(1, 10, 30) },

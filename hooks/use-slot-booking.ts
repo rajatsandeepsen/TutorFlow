@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { create } from "zustand";
+import type { USER } from "@/lib/auth";
 
 const DURATIONS = [
 	"30 mins",
@@ -54,6 +55,7 @@ const TIME_PERIODS: {
 ];
 
 export type BookedSlot = {
+	user: USER;
 	startTime: Date;
 	endTime: Date;
 };
