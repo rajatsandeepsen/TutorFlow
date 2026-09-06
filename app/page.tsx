@@ -1,30 +1,30 @@
-"use client";
+import { GraduationCapIcon } from "lucide-react";
+import { type HeroBasicProps, LandingPage } from "@/components/home";
 
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/hooks/api";
+const defaultProps: HeroBasicProps = {
+	heading: "TutorFlow for 1:1 Teaching",
+	description:
+		"Run your full tutoring workflow in one place. Manage students, sessions, notes, homework, and communication with AI-assisted planning, debriefing, and progress tracking.",
+	buttons: {
+		primary: {
+			text: "Get Started",
+			url: "/login",
+		},
+		secondary: {
+			text: "Sign In",
+			url: "/login",
+		},
+	},
+	image: {
+		src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/modern/saas-hero/saas-hero-1-16x9.png",
+		srcDark:
+			"https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/modern/saas-hero/saas-hero-1-16x9-dark.png",
+		alt: "Hero Image Placeholder",
+	},
+	byline: "Trusted by 0,00,001 businesses worldwide",
+	icon: <GraduationCapIcon className="size-6" />,
+};
 
 export default function Home() {
-	const healthCheck = useQuery(api.healthCheck.queryOptions());
-
-	return (
-		<div className="container mx-auto max-w-3xl px-4 py-2">
-			<div className="grid gap-6">
-				<section className="rounded-lg border p-4">
-					<h2 className="mb-2 font-medium">API Status</h2>
-					<div className="flex items-center gap-2">
-						<div
-							className={`h-2 w-2 rounded-full ${healthCheck.data ? "bg-green-500" : "bg-red-500"}`}
-						/>
-						<span className="text-sm text-muted-foreground">
-							{healthCheck.isLoading
-								? "Checking..."
-								: healthCheck.data
-									? "Connected"
-									: "Disconnected"}
-						</span>
-					</div>
-				</section>
-			</div>
-		</div>
-	);
+	return <LandingPage {...defaultProps} />;
 }

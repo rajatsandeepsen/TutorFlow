@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { authClient } from "@/hooks/auth";
 
 function SignUpFields() {
-	const router = useRouter();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,7 +35,6 @@ function SignUpFields() {
 			},
 			{
 				onSuccess: () => {
-					router.push("/teacher");
 					toast.success("Sign up successful");
 				},
 				onError: (error) => {
@@ -80,7 +77,6 @@ function SignUpFields() {
 }
 
 function SignInFields() {
-	const router = useRouter();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,7 +95,6 @@ function SignInFields() {
 			},
 			{
 				onSuccess: () => {
-					router.push("/dashboard");
 					toast.success("Sign in successful");
 				},
 				onError: (error) => {

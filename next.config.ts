@@ -3,12 +3,12 @@ import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import { env } from "env";
 import type { NextConfig } from "next";
 
-initOpenNextCloudflareForDev();
+if (env.NODE_ENV === "production") {
+	initOpenNextCloudflareForDev();
+}
 
 const nextConfig: NextConfig = {
 	pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
-	// output: "export",
-	// distDir: "out",
 	trailingSlash: true,
 	images: { unoptimized: true },
 	turbopack: {

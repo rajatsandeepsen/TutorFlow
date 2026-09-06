@@ -46,5 +46,5 @@ export default function Layout({
 			</Container>
 		);
 
-	return <Container className="space-y-4">{children}</Container>;
+	return children;
 }

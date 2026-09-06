@@ -48,3 +48,33 @@ export const CenterContainer = ({
 		</div>
 	);
 };
+
+export const SelfCenterContainer = ({
+	children,
+	containerClassName,
+	className,
+}: Readonly<{
+	children: React.ReactNode;
+	containerClassName?: string;
+	className?: string;
+}>) => {
+	return (
+		<div className="grid size-full grid-rows-[1fr]">
+			<div
+				className={cn(
+					"self-center justify-self-center p-3 md:py-8",
+					containerClassName,
+				)}
+			>
+				<div
+					className={cn(
+						"min-w-sm md:min-w-md lg:w-lg xl:w-xl 2xl:w-2xl",
+						className,
+					)}
+				>
+					{children}
+				</div>
+			</div>
+		</div>
+	);
+};
