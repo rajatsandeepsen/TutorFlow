@@ -267,7 +267,7 @@ function DateTimeComponent({
 						: "Invalid Date"}
 				</span>
 			</PopoverTrigger>
-			<PopoverContent dir={dir} align="start" className="w-auto gap-0 p-0">
+			<PopoverContent align="start" className="w-auto gap-0 p-0">
 				<Calendar
 					mode="single"
 					captionLayout="dropdown"

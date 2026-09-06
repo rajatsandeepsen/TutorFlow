@@ -78,7 +78,7 @@ export function InsertFigmaPlugin() {
 				</TooltipTrigger>
 				<TooltipContent>{t.insertFigma}</TooltipContent>
 			</Tooltip>
-			<PopoverContent dir={dir} align="start" className="w-72">
+			<PopoverContent align="start" className="w-72">
 				<div className="flex flex-col gap-2">
 					<Input
 						dir="ltr"

@@ -52,7 +52,10 @@ const updateStudentExtraProfileProcedure = teacherProcedure
 		const existingProfile = await tryAPI(
 			"teacher.updateStudentExtraProfile.findProfile",
 			context.db.query.studentProfile.findFirst({
-				where: eq(studentProfile.studentId, input.studentId),
+				where: and(
+					eq(studentProfile.studentId, input.studentId),
+					eq(studentProfile.teacherId, context.user.id),
+				),
 				columns: { id: true },
 			}),
 		);
@@ -64,6 +67,7 @@ const updateStudentExtraProfileProcedure = teacherProcedure
 					.insert(studentProfile)
 					.values({
 						studentId: input.studentId,
+						teacherId: context.user.id,
 						name: input.name,
 						subject: input.subject,
 						currentLevel: input.currentLevel,
@@ -99,7 +103,12 @@ const updateStudentExtraProfileProcedure = teacherProcedure
 					learningGoals: input.learningGoals,
 					weakAreas: input.weakAreas,
 				})
-				.where(eq(studentProfile.studentId, input.studentId))
+				.where(
+					and(
+						eq(studentProfile.studentId, input.studentId),
+						eq(studentProfile.teacherId, context.user.id),
+					),
+				)
 				.returning(),
 		);
 
@@ -567,7 +576,13 @@ export const teacherRouter = {
 						weakAreas: studentProfile.weakAreas,
 					})
 					.from(user)
-					.leftJoin(studentProfile, eq(studentProfile.studentId, user.id))
+					.leftJoin(
+						studentProfile,
+						and(
+							eq(studentProfile.studentId, user.id),
+							eq(studentProfile.teacherId, context.user.id),
+						),
+					)
 					.where(
 						and(eq(user.role, "student"), ilike(user.name, `%${input.query}%`)),
 					)

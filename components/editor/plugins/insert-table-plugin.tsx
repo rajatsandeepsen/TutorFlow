@@ -139,7 +139,7 @@ export function InsertTablePlugin() {
 				</TooltipTrigger>
 				<TooltipContent>{t.insertTable}</TooltipContent>
 			</Tooltip>
-			<PopoverContent dir={dir} align="start" className="w-auto">
+			<PopoverContent align="start" className="w-auto">
 				<TableGridPicker onSelect={onSelect} />
 			</PopoverContent>
 		</Popover>

@@ -8,10 +8,11 @@ import { getError, studentProcedure, tryAPI } from "./procedure";
 
 export const studentRouter = {
 	getMyProfile: studentProcedure.handler(async ({ context }) => {
-		const profile = await tryAPI(
-			"student.getMyProfile.findProfile",
-			context.db.query.studentProfile.findFirst({
+		const profiles = await tryAPI(
+			"student.getMyProfile.findProfiles",
+			context.db.query.studentProfile.findMany({
 				where: eq(studentProfile.studentId, context.user.id),
+				orderBy: (table, { desc }) => [desc(table.updatedAt)],
 			}),
 		);
 
@@ -22,7 +23,8 @@ export const studentRouter = {
 				email: context.user.email,
 				image: context.user.image,
 			},
-			profile,
+			profile: profiles[0] ?? null,
+			profiles,
 		};
 	}),
 

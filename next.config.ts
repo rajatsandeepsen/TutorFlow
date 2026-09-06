@@ -4,8 +4,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
-	output: "export",
-	distDir: "out",
+	// output: "export",
+	// distDir: "out",
 	trailingSlash: true,
 	images: { unoptimized: true },
 	turbopack: {

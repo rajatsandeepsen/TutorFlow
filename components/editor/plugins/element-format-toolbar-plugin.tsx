@@ -39,7 +39,7 @@ function AlignToggleGroup({ items }: { items: AlignItem[] }) {
 			size="sm"
 			spacing={0}
 			disabled={!isEditable}
-			value={[elementFormat]}
+			value={elementFormat}
 			onValueChange={(value) => {
 				const next = value[0] as Exclude<ElementFormatType, ""> | undefined;
 				if (next) {

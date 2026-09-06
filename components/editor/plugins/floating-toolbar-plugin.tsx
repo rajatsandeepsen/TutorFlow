@@ -163,7 +163,6 @@ function FloatingToolbar({
 				style={{ transform: "translate(-10000px, -10000px)" }}
 			/>
 			<PopoverContent
-				dir={dir}
 				ref={setPopupRefs}
 				side="top"
 				align="start"

@@ -251,7 +251,6 @@ export function RubyEditorPlugin() {
 			/>
 
 			<PopoverContent
-				dir={dir}
 				ref={contentRef}
 				side="bottom"
 				align="start"

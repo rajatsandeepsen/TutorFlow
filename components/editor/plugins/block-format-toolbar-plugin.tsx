@@ -214,7 +214,7 @@ export function BlockFormatToolbarPlugin() {
 				disabled={!isEditable}
 				className="h-7 w-48"
 			/>
-			<ComboboxContent dir={dir}>
+			<ComboboxContent>
 				<ComboboxEmpty>{t.noMatches}</ComboboxEmpty>
 				<ComboboxList>
 					{(item: BlockType) => {

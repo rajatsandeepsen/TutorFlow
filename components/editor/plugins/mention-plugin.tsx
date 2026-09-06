@@ -260,7 +260,6 @@ export function MentionPlugin() {
 							/>
 						</PopoverTrigger>
 						<PopoverContent
-							dir={dir}
 							side="bottom"
 							align="start"
 							sideOffset={6}

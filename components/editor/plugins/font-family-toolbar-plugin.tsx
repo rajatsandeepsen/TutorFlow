@@ -48,7 +48,7 @@ export function FontFamilyToolbarPlugin() {
 				disabled={!isEditable}
 				className="h-7 w-44"
 			/>
-			<ComboboxContent dir={dir}>
+			<ComboboxContent>
 				<ComboboxEmpty>{t.noMatches}</ComboboxEmpty>
 				<ComboboxList>
 					{(family: string) => (

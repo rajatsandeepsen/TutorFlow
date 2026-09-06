@@ -21,7 +21,11 @@ export const studentProfile = pgTable(
 		updatedAt: updatedAt(),
 	},
 	(table) => [
-		uniqueIndex("student_profile_student_id_unique").on(table.studentId),
+		uniqueIndex("student_profile_student_teacher_unique").on(
+			table.studentId,
+			table.teacherId,
+		),
 		index("student_profile_subject_idx").on(table.subject),
+		index("student_profile_teacher_id_idx").on(table.teacherId),
 	],
 );

@@ -103,7 +103,7 @@ export function ImportExportToolbarPlugin({
 					</TooltipTrigger>
 					<TooltipContent>{t.exportAs}</TooltipContent>
 				</Tooltip>
-				<DropdownMenuContent dir={dir}>
+				<DropdownMenuContent>
 					<DropdownMenuItem onClick={exportLexical}>
 						{t.exportLexical}
 					</DropdownMenuItem>

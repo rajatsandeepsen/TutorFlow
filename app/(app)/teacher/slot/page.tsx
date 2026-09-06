@@ -1,39 +1,75 @@
 "use client";
 
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
 	Card,
 	CardContent,
+	CardDescription,
 	CardFooter,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-	type BookedSlot,
-	useTeacherSlotBooking,
-} from "@/hooks/use-slot-booking";
+import { Textarea } from "@/components/ui/textarea";
+import { api, client } from "@/hooks/api";
+import { MutationButton } from "@/hooks/mutation";
+import { useTeacherSlotBooking } from "@/hooks/use-slot-booking";
 
-const withTime = (offsetDays: number, hour: number, minute: number) => {
-	const value = new Date();
-	value.setHours(0, 0, 0, 0);
-	value.setDate(value.getDate() + offsetDays);
-	value.setHours(hour, minute, 0, 0);
+const DURATION_TO_MINUTES = {
+	"30 mins": 30,
+	"1 hour": 60,
+	"2 hours": 120,
+	"3 hours": 180,
+	"6 hours": 360,
+} as const;
+
+const ACTIVE_SLOT_STATUSES = ["pending", "confirmed", "in_progress"] as const;
+
+type ActiveSlotStatus = (typeof ACTIVE_SLOT_STATUSES)[number];
+
+const isActiveSlotStatus = (status: string): status is ActiveSlotStatus => {
+	return ACTIVE_SLOT_STATUSES.includes(status as ActiveSlotStatus);
+};
+
+const parseStartTime = (date: Date, time: string) => {
+	const [hourText, minuteText] = time.split(":");
+	const value = new Date(date);
+	value.setHours(Number(hourText), Number(minuteText), 0, 0);
 	return value;
 };
 
-const initialBookedSlots: Omit<BookedSlot, "user">[] = [
-	{ startTime: withTime(0, 10, 0), endTime: withTime(0, 11, 0) },
-	{ startTime: withTime(0, 14, 30), endTime: withTime(0, 15, 15) },
-	{ startTime: withTime(1, 9, 30), endTime: withTime(1, 10, 30) },
-	{ startTime: withTime(1, 16, 45), endTime: withTime(1, 17, 30) },
-	{ startTime: withTime(2, 12, 0), endTime: withTime(2, 13, 30) },
-];
-
 export default function Page() {
+	const params = useParams<{ studentId?: string }>();
+	const [studentIdInput, setStudentIdInput] = useState("");
+	const [topic, setTopic] = useState("");
+	const [description, setDescription] = useState("");
+	const [joinLink, setJoinLink] = useState("");
+	const [activeTimePeriod, setActiveTimePeriod] = useState("morning");
+
+	const studentId = (params.studentId ?? studentIdInput).trim();
+
+	const slotsQuery = useQuery({
+		queryKey: ["teacher", "slots", "for-scheduling"],
+		queryFn: () => client.teacher.getSlotsList({ limit: 200 }),
+	});
+
+	const bookedSlots = useMemo(() => {
+		return (slotsQuery.data ?? [])
+			.filter((item) => isActiveSlotStatus(item.status))
+			.map((item) => ({
+				startTime: new Date(item.startTime),
+				endTime: new Date(item.endTime),
+			}));
+	}, [slotsQuery.data]);
+
 	const {
 		date,
 		setDate,
@@ -49,109 +85,225 @@ export default function Page() {
 		isDateDisabled,
 		confirmDisabled,
 		bookingStatusMessage,
-	} = useTeacherSlotBooking(initialBookedSlots);
-	const [activeTimePeriod, setActiveTimePeriod] = useState("morning");
+	} = useTeacherSlotBooking(bookedSlots);
+
 	const activeTimeGroup =
 		timePeriodGroups.find((group) => group.key === activeTimePeriod) ??
 		timePeriodGroups[0];
 
+	const payload = useMemo(() => {
+		if (!date || !selectedTime) return null;
+		if (!studentId || !topic.trim()) return null;
+
+		const startTime = parseStartTime(date, selectedTime);
+		const durationMinutes =
+			DURATION_TO_MINUTES[
+				selectedDuration as keyof typeof DURATION_TO_MINUTES
+			] ?? 60;
+		const endTime = new Date(startTime);
+		endTime.setMinutes(endTime.getMinutes() + durationMinutes);
+
+		return {
+			studentId,
+			startTime,
+			endTime,
+			topic: topic.trim(),
+			description: description.trim() || undefined,
+			joinLink: joinLink.trim() || undefined,
+		};
+	}, [
+		date,
+		selectedTime,
+		selectedDuration,
+		studentId,
+		topic,
+		description,
+		joinLink,
+	]);
+
+	const canSchedule = !!payload && !confirmDisabled;
+
 	return (
 		<Card className="gap-0 p-0">
-			<CardHeader className="flex h-max items-center justify-start border-b px-4! py-3!">
-				<CardTitle>Book your appointment</CardTitle>
+			<CardHeader className="border-b">
+				<CardTitle>Schedule 1:1 Session</CardTitle>
+				<CardDescription>
+					Pick a time slot and schedule a class for your student.
+				</CardDescription>
 			</CardHeader>
-			<CardContent className="relative overflow-hidden p-0 md:min-h-[34rem] md:pr-52">
-				<div className="space-y-4 p-4">
-					<Calendar
-						className="w-full"
-						mode="single"
-						selected={date}
-						onSelect={setDate}
-						defaultMonth={date}
-						disabled={isDateDisabled}
-						showOutsideDays={false}
-					/>
+			<CardContent className="space-y-4 p-4">
+				<div className="grid gap-4 md:grid-cols-2">
 					<div className="space-y-2">
-						<p className="font-medium text-sm">Quick dates</p>
-						<div className="flex flex-wrap gap-2">
-							{quickDateOptions.map((option) => {
-								const active = !!date && isSameDay(option.date, date);
-
-								return (
-									<Button
-										key={option.label}
-										variant={active ? "default" : "outline"}
-										onClick={() => setDate(option.date)}
-										className="shadow-none"
-									>
-										{option.label}
-									</Button>
-								);
-							})}
-						</div>
+						<Label htmlFor="student-id">Student ID</Label>
+						<Input
+							id="student-id"
+							value={studentId}
+							onChange={(event) => setStudentIdInput(event.target.value)}
+							readOnly={!!params.studentId}
+							placeholder="student_..."
+						/>
 					</div>
 					<div className="space-y-2">
-						<p className="font-medium text-sm">Duration</p>
-						<div className="flex flex-wrap gap-2">
-							{durations.map((duration) => (
-								<Button
-									key={duration}
-									variant={
-										selectedDuration === duration ? "default" : "outline"
-									}
-									onClick={() => setSelectedDuration(duration)}
-									className="shadow-none"
-								>
-									{duration}
-								</Button>
-							))}
-						</div>
+						<Label htmlFor="topic">Session topic</Label>
+						<Input
+							id="topic"
+							value={topic}
+							onChange={(event) => setTopic(event.target.value)}
+							placeholder="Algebra: Linear equations"
+						/>
 					</div>
 				</div>
-				<div className="inset-y-0 right-0 flex min-h-0 w-full flex-col gap-3 border-t max-md:h-60 md:absolute md:w-52 md:border-t-0 md:border-l">
-					<Tabs
-						value={activeTimePeriod}
-						onValueChange={setActiveTimePeriod}
-						className="flex h-full min-h-0 flex-col"
-					>
-						<TabsList className="m-4 w-auto">
-							{timePeriodGroups.map((group) => (
-								<TabsTrigger key={group.key} value={group.key}>
-									{group.label}
-								</TabsTrigger>
-							))}
-						</TabsList>
-						<ScrollArea className="min-h-0 flex-1">
-							<div className="flex flex-col gap-2 p-4 pt-3">
-								{activeTimeGroup.times.map((time) => {
-									const unavailable = isTimeUnavailable(time);
+
+				<div className="space-y-2">
+					<Label htmlFor="description">Session plan (optional)</Label>
+					<Textarea
+						id="description"
+						value={description}
+						onChange={(event) => setDescription(event.target.value)}
+						placeholder="Learning goals or agenda"
+					/>
+				</div>
+
+				<div className="space-y-2">
+					<Label htmlFor="join-link">Join link (optional)</Label>
+					<Input
+						id="join-link"
+						type="url"
+						value={joinLink}
+						onChange={(event) => setJoinLink(event.target.value)}
+						placeholder="https://meet.google.com/..."
+					/>
+				</div>
+
+				<div className="grid gap-4 md:grid-cols-[1fr_13rem]">
+					<div className="space-y-4">
+						<Calendar
+							className="w-full"
+							mode="single"
+							selected={date}
+							onSelect={setDate}
+							defaultMonth={date}
+							disabled={isDateDisabled}
+							showOutsideDays={false}
+						/>
+						<div className="space-y-2">
+							<p className="font-medium text-sm">Quick dates</p>
+							<div className="flex flex-wrap gap-2">
+								{quickDateOptions.map((option) => {
+									const active = !!date && isSameDay(option.date, date);
 
 									return (
 										<Button
-											key={time}
-											variant={selectedTime === time ? "default" : "outline"}
-											onClick={() => setSelectedTime(time)}
-											disabled={unavailable}
-											className="w-full shadow-none"
+											key={option.label}
+											variant={active ? "default" : "outline"}
+											onClick={() => setDate(option.date)}
 										>
-											{time}
+											{option.label}
 										</Button>
 									);
 								})}
 							</div>
-						</ScrollArea>
-					</Tabs>
+						</div>
+						<div className="space-y-2">
+							<p className="font-medium text-sm">Duration</p>
+							<div className="flex flex-wrap gap-2">
+								{durations.map((duration) => (
+									<Button
+										key={duration}
+										variant={
+											selectedDuration === duration ? "default" : "outline"
+										}
+										onClick={() => setSelectedDuration(duration)}
+									>
+										{duration}
+									</Button>
+								))}
+							</div>
+						</div>
+					</div>
+					<div className="min-h-0 rounded-md border">
+						<Tabs
+							value={activeTimePeriod}
+							onValueChange={setActiveTimePeriod}
+							className="flex h-full min-h-[18rem] flex-col"
+						>
+							<TabsList className="m-3 w-auto">
+								{timePeriodGroups.map((group) => (
+									<TabsTrigger key={group.key} value={group.key}>
+										{group.label}
+									</TabsTrigger>
+								))}
+							</TabsList>
+							<ScrollArea className="min-h-0 flex-1">
+								<div className="flex flex-col gap-2 p-3 pt-0">
+									{activeTimeGroup.times.map((time) => {
+										const unavailable = isTimeUnavailable(time);
+
+										return (
+											<Button
+												key={time}
+												variant={selectedTime === time ? "default" : "outline"}
+												onClick={() => setSelectedTime(time)}
+												disabled={unavailable}
+											>
+												{time}
+											</Button>
+										);
+									})}
+								</div>
+							</ScrollArea>
+						</Tabs>
+					</div>
 				</div>
 			</CardContent>
-			<CardFooter className="flex flex-col gap-4 border-t px-4 py-3! md:flex-row">
-				<div className="max-w-72 text-sm">{bookingStatusMessage}</div>
-				<Button
-					disabled={confirmDisabled}
-					className="w-full md:ml-auto md:w-auto"
-					variant="outline"
-				>
-					Confirm
-				</Button>
+			<CardFooter className="flex flex-col gap-4 border-t md:flex-row md:items-center">
+				<p className="text-muted-foreground text-sm">{bookingStatusMessage}</p>
+				<MutationButton
+					api={api.teacher.createSession.mutationOptions({
+						onError: (error) => {
+							toast.error(error.message);
+						},
+					})}
+					onSuccess={async (data) => {
+						toast.success(
+							`Session scheduled for ${new Date(data.startTime).toLocaleString()}`,
+						);
+						setTopic("");
+						setDescription("");
+						setJoinLink("");
+						await slotsQuery.refetch();
+					}}
+					mutate={(mutate) => (
+						<Button
+							type="button"
+							className="w-full md:ml-auto md:w-auto"
+							disabled={!canSchedule}
+							onClick={() => payload && mutate(payload)}
+						>
+							Schedule session
+						</Button>
+					)}
+					isPending={
+						<Button
+							type="button"
+							className="w-full md:ml-auto md:w-auto"
+							disabled
+						>
+							Scheduling...
+						</Button>
+					}
+					reTry={(mutate) => (
+						<Button
+							type="button"
+							variant="outline"
+							className="w-full md:ml-auto md:w-auto"
+							disabled={!canSchedule}
+							onClick={() => payload && mutate(payload)}
+						>
+							Try again
+						</Button>
+					)}
+				/>
 			</CardFooter>
 		</Card>
 	);

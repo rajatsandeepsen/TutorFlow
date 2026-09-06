@@ -129,7 +129,6 @@ function AddCommentButton({
 			/>
 
 			<PopoverContent
-				dir={dir}
 				side="top"
 				align="end"
 				sideOffset={4}
@@ -267,7 +266,6 @@ function CommentInputBox({
 			/>
 
 			<PopoverContent
-				dir={dir}
 				side="bottom"
 				align="center"
 				sideOffset={12}
@@ -347,10 +345,7 @@ function DeleteButton({
 					<Trash2 />
 				</Button>
 			</AlertDialogTrigger>
-			<AlertDialogContent
-				dir={dir}
-				onClick={(event) => event.stopPropagation()}
-			>
+			<AlertDialogContent onClick={(event) => event.stopPropagation()}>
 				<AlertDialogHeader>
 					<AlertDialogTitle>{title}</AlertDialogTitle>
 				</AlertDialogHeader>

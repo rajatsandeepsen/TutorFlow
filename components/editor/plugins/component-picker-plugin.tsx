@@ -167,11 +167,9 @@ export function ComponentPicker({ children }: { children: React.ReactNode }) {
 								/>
 							</PopoverTrigger>
 							<PopoverContent
-								dir={dir}
 								side="bottom"
 								align="start"
 								sideOffset={6}
-								finalFocus={false}
 								className="w-auto overflow-hidden p-0"
 							>
 								<Command

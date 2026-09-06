@@ -1,332 +1,152 @@
 "use client";
 
-import { ClipboardDOMImportExtension } from "@lexical/clipboard";
-import { $createCodeNode } from "@lexical/code-core";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
-	ClearEditorExtension,
-	HorizontalRuleExtension,
-	TabIndentationExtension,
-} from "@lexical/extension";
-import { HashtagExtension } from "@lexical/hashtag";
-import { HistoryExtension } from "@lexical/history";
-import {
-	$createListItemNode,
-	$createListNode,
-	CheckListExtension,
-	ListExtension,
-} from "@lexical/list";
-import {
-	CHECK_LIST,
-	ELEMENT_TRANSFORMERS,
-	MULTILINE_ELEMENT_TRANSFORMERS,
-	registerMarkdownShortcuts,
-	TEXT_FORMAT_TRANSFORMERS,
-	TEXT_MATCH_TRANSFORMERS,
-	type Transformer,
-} from "@lexical/markdown";
-import { LexicalExtensionComposer } from "@lexical/react/LexicalExtensionComposer";
-import {
-	$createHeadingNode,
-	$createQuoteNode,
-	RichTextExtension,
-} from "@lexical/rich-text";
-import { TableExtension } from "@lexical/table";
-import {
-	$createParagraphNode,
-	$createTextNode,
-	$getRoot,
-	defineExtension,
-} from "lexical";
-import { useMemo } from "react";
-import {
-	ActivityBar,
-	AutocompleteExtension,
-	AutoEmbedPlugin,
-	AutoLinkExtension,
-	BlockFormatToolbarPlugin,
-	BlockInsert,
-	BulletedListPickerPlugin,
-	CardExtension,
-	CardPickerPlugin,
-	CheckListPickerPlugin,
-	ClearToolbarPlugin,
-	CodeExtension,
-	CodePickerPlugin,
-	CollapsibleExtension,
-	CollapsiblePickerPlugin,
-	ColorToolbarPlugin,
-	ColumnsPickerPlugin,
-	ComponentPicker,
-	ContentEditable,
-	ContextMenuPlugin,
-	CountPlugin,
-	DateTimeExtension,
-	DateTimePickerPlugin,
-	DividerPickerPlugin,
-	DragDropPasteExtension,
-	DraggableBlockPlugin,
-	ElementFormatToolbarPlugin,
-	EMOJI,
-	EmojiExtension,
-	EmojiPickerPlugin,
-	EquationExtension,
-	editorTheme,
-	FigmaExtension,
-	FloatingToolbarPlugin,
-	FontFamilyToolbarPlugin,
-	FontSizeToolbarPlugin,
-	FormatStateExtension,
-	HeadingPickerPlugin,
-	HistoryToolbarPlugin,
-	HR,
-	IMAGE,
-	ImageExtension,
-	ImagePickerPlugin,
-	ImportExportToolbarPlugin,
-	IndentToolbarPlugin,
-	InsertCodeBlockPlugin,
-	InsertColumnsPlugin,
-	InsertEmojiPlugin,
-	InsertEquationPlugin,
-	InsertHorizontalRulePlugin,
-	InsertImagePlugin,
-	InsertTablePlugin,
-	LanguageProvider,
-	LanguageSelectorPlugin,
-	LayoutExtension,
-	LinkEditorPlugin,
-	LinkExtension,
-	LinkToolbarPlugin,
-	MentionExtension,
-	MentionPlugin,
-	NumberedListPickerPlugin,
-	ParagraphPickerPlugin,
-	PollExtension,
-	PollPickerPlugin,
-	PullQuoteExtension,
-	PullQuotePickerPlugin,
-	QuotePickerPlugin,
-	ReactFindReplaceExtension,
-	ReactReviewExtension,
-	ReadOnlyTogglePlugin,
-	ReviewPickerPlugin,
-	RubyEditorPlugin,
-	RubyExtension,
-	RubyToolbarPlugin,
-	ShortcutPlugin,
-	ShortcutsExtension,
-	SpecialTextExtension,
-	SpeechToTextExtension,
-	SpeechToTextPlugin,
-	TABLE,
-	TabFocusExtension,
-	TableHoverActionsPlugin,
-	TablePickerPlugin,
-	TextFormatToolbarPlugin,
-	Toolbar,
-	TwitterExtension,
-	useLanguage,
-	YouTubeExtension,
-} from "@/components/editor";
-import { DirectionProvider } from "@/components/ui/direction";
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { api } from "@/hooks/api";
+import { MutationButton } from "@/hooks/mutation";
 
-const EDITOR_TRANSFORMERS: Transformer[] = [
-	TABLE,
-	HR,
-	IMAGE,
-	EMOJI,
-	CHECK_LIST,
-	...ELEMENT_TRANSFORMERS,
-	...MULTILINE_ELEMENT_TRANSFORMERS,
-	...TEXT_FORMAT_TRANSFORMERS,
-	...TEXT_MATCH_TRANSFORMERS,
-];
+export default function Page() {
+	const params = useParams<{ slotId?: string }>();
+	const [slotIdInput, setSlotIdInput] = useState("");
+	const [noteText, setNoteText] = useState("");
+	const [homeworkQuestion, setHomeworkQuestion] = useState("");
+	const [homeworkLink, setHomeworkLink] = useState("");
 
-export default function EditorX() {
-	const app = useMemo(
-		() =>
-			defineExtension({
-				name: "@shadcn-editor/editor",
-				namespace: "shadcn-editor",
-				dependencies: [
-					RichTextExtension,
-					HistoryExtension,
-					TabIndentationExtension,
-					ListExtension,
-					CheckListExtension,
-					HashtagExtension,
-					LinkExtension,
-					AutoLinkExtension,
-					CodeExtension,
-					LayoutExtension,
-					EmojiExtension,
-					EquationExtension,
-					TableExtension,
-					HorizontalRuleExtension,
-					ImageExtension,
-					MentionExtension,
-					SpecialTextExtension,
-					DragDropPasteExtension,
-					TabFocusExtension,
-					SpeechToTextExtension,
-					ShortcutsExtension,
-					CardExtension,
-					CollapsibleExtension,
-					DateTimeExtension,
-					PullQuoteExtension,
-					ReactReviewExtension,
-					PollExtension,
-					RubyExtension,
-					YouTubeExtension,
-					TwitterExtension,
-					FigmaExtension,
-					FormatStateExtension,
-					ReactFindReplaceExtension,
-					ClearEditorExtension,
-					ClipboardDOMImportExtension,
-				],
-				$initialEditorState: () => {
-					$getRoot().append(
-						$createHeadingNode("h1").append($createTextNode("Editor X")),
-						$createParagraphNode().append(
-							$createTextNode("A "),
-							$createTextNode("complete").toggleFormat("bold"),
-							$createTextNode(" writing surface: "),
-							$createTextNode("rich text").toggleFormat("italic"),
-							$createTextNode(", "),
-							$createTextNode("markdown shortcuts").toggleFormat("underline"),
-							$createTextNode(", and "),
-							$createTextNode("blocks").toggleFormat("code"),
-							$createTextNode(", all in one place."),
-						),
-						$createHeadingNode("h2").append(
-							$createTextNode("Everything included"),
-						),
-						$createListNode("bullet").append(
-							$createListItemNode().append(
-								$createTextNode(
-									"Tables, images, equations, and embeds from the toolbar",
-								),
-							),
-							$createListItemNode().append(
-								$createTextNode('A slash menu: type "/" to insert any block'),
-							),
-							$createListItemNode().append(
-								$createTextNode(
-									"Drag handles, a floating toolbar, mentions, and emoji",
-								),
-							),
-						),
-						$createQuoteNode().append(
-							$createTextNode(
-								"Select any text to format it in place, or grab a drag handle to rearrange the page.",
-							),
-						),
-						$createCodeNode("markdown").append(
-							$createTextNode("## Markdown works too, as you type"),
-						),
-						$createParagraphNode().append(
-							$createTextNode(
-								'Try it now: press "/" on the empty line below, or explore the toolbar above.',
-							),
-						),
-						$createParagraphNode(),
-					);
-				},
-				register: (editor) =>
-					registerMarkdownShortcuts(editor, EDITOR_TRANSFORMERS),
-				theme: editorTheme,
-			}),
-		[],
-	);
+	const slotId = (params.slotId ?? slotIdInput).trim();
+	const canAddNote = slotId.length > 0 && noteText.trim().length > 0;
+	const canCreateHomework =
+		slotId.length > 0 && homeworkQuestion.trim().length > 0;
 
 	return (
-		<LanguageProvider>
-			<LexicalExtensionComposer extension={app} contentEditable={null}>
-				<EditorWrapper>
-					<Toolbar>
-						<HistoryToolbarPlugin />
-						<BlockFormatToolbarPlugin />
-						<FontFamilyToolbarPlugin />
-						<FontSizeToolbarPlugin />
-						<ColorToolbarPlugin />
-						<TextFormatToolbarPlugin formats="basic" />
-						<ElementFormatToolbarPlugin formats="basic" />
-						<IndentToolbarPlugin />
-						<BlockInsert>
-							<InsertCodeBlockPlugin />
-							<InsertColumnsPlugin />
-							<InsertEmojiPlugin />
-							<InsertEquationPlugin />
-							<InsertHorizontalRulePlugin />
-							<InsertImagePlugin />
-							<InsertTablePlugin />
-						</BlockInsert>
-						<ClearToolbarPlugin />
-						<ImportExportToolbarPlugin transformers={EDITOR_TRANSFORMERS} />
-					</Toolbar>
-					<div className="relative min-w-0 flex-1 overflow-y-auto">
-						<ContentEditable variant="draggable" />
-						<DraggableBlockPlugin />
-						<FloatingToolbarPlugin>
-							<LinkToolbarPlugin />
-							<RubyToolbarPlugin />
-						</FloatingToolbarPlugin>
-						<LinkEditorPlugin />
-						<RubyEditorPlugin />
-						<TableHoverActionsPlugin />
-						<EmojiPickerPlugin />
-						<MentionPlugin />
-						<AutoEmbedPlugin />
-						<ContextMenuPlugin />
-						<ComponentPicker>
-							<ParagraphPickerPlugin />
-							<HeadingPickerPlugin />
-							<TablePickerPlugin />
-							<NumberedListPickerPlugin />
-							<BulletedListPickerPlugin />
-							<CheckListPickerPlugin />
-							<QuotePickerPlugin />
-							<CodePickerPlugin />
-							<DividerPickerPlugin />
-							<ColumnsPickerPlugin />
-							<ImagePickerPlugin />
-							<CardPickerPlugin />
-							<CollapsiblePickerPlugin />
-							<DateTimePickerPlugin />
-							<PullQuotePickerPlugin />
-							<ReviewPickerPlugin />
-							<PollPickerPlugin />
-						</ComponentPicker>
+		<div className="grid gap-4 p-4">
+			<Card>
+				<CardHeader>
+					<CardTitle>Session Notes</CardTitle>
+					<CardDescription>
+						Capture what happened in class for this session.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="space-y-2">
+						<Label htmlFor="slot-id">Slot ID</Label>
+						<Input
+							id="slot-id"
+							value={slotId}
+							onChange={(event) => setSlotIdInput(event.target.value)}
+							readOnly={!!params.slotId}
+							placeholder="slot_..."
+						/>
 					</div>
-					<ActivityBar>
-						<div className="flex items-center gap-3">
-							<CountPlugin />
-						</div>
-						<div className="ms-auto flex items-center gap-3">
-							<SpeechToTextPlugin />
-							<ReadOnlyTogglePlugin />
-							<ShortcutPlugin />
-							<LanguageSelectorPlugin />
-						</div>
-					</ActivityBar>
-				</EditorWrapper>
-			</LexicalExtensionComposer>
-		</LanguageProvider>
-	);
-}
+					<div className="space-y-2">
+						<Label htmlFor="note-text">Note</Label>
+						<Textarea
+							id="note-text"
+							value={noteText}
+							onChange={(event) => setNoteText(event.target.value)}
+							placeholder="Student progress, blockers, next steps"
+						/>
+					</div>
+					<MutationButton
+						api={api.teacher.addSessionNote.mutationOptions({
+							onError: (error) => {
+								toast.error(error.message);
+							},
+						})}
+						onSuccess={() => {
+							toast.success("Session note saved");
+							setNoteText("");
+						}}
+						mutate={(mutate) => (
+							<Button
+								type="button"
+								disabled={!canAddNote}
+								onClick={() => mutate({ slotId, text: noteText.trim() })}
+							>
+								Save note
+							</Button>
+						)}
+						isPending={
+							<Button type="button" disabled>
+								Saving...
+							</Button>
+						}
+					/>
+				</CardContent>
+			</Card>
 
-function EditorWrapper({ children }: { children: React.ReactNode }) {
-	const { language, dir } = useLanguage();
-	return (
-		<DirectionProvider dir={dir}>
-			<div
-				dir={dir}
-				lang={language}
-				className="flex flex-1 flex-col overflow-hidden"
-			>
-				{children}
-			</div>
-		</DirectionProvider>
+			<Card>
+				<CardHeader>
+					<CardTitle>Assign Homework</CardTitle>
+					<CardDescription>
+						Create a homework task for this completed session.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="space-y-2">
+						<Label htmlFor="homework-question">Question</Label>
+						<Textarea
+							id="homework-question"
+							value={homeworkQuestion}
+							onChange={(event) => setHomeworkQuestion(event.target.value)}
+							placeholder="Practice questions or assignment details"
+						/>
+					</div>
+					<div className="space-y-2">
+						<Label htmlFor="homework-link">Homework link (optional)</Label>
+						<Input
+							id="homework-link"
+							type="url"
+							value={homeworkLink}
+							onChange={(event) => setHomeworkLink(event.target.value)}
+							placeholder="https://docs.google.com/..."
+						/>
+					</div>
+					<MutationButton
+						api={api.teacher.createHomework.mutationOptions({
+							onError: (error) => {
+								toast.error(error.message);
+							},
+						})}
+						onSuccess={(data) => {
+							toast.success(`Homework created: ${data.id}`);
+							setHomeworkQuestion("");
+							setHomeworkLink("");
+						}}
+						mutate={(mutate) => (
+							<Button
+								type="button"
+								disabled={!canCreateHomework}
+								onClick={() =>
+									mutate({
+										slotId,
+										question: homeworkQuestion.trim(),
+										homeworkLink: homeworkLink.trim() || undefined,
+									})
+								}
+							>
+								Create homework
+							</Button>
+						)}
+						isPending={
+							<Button type="button" disabled>
+								Creating...
+							</Button>
+						}
+					/>
+				</CardContent>
+			</Card>
+		</div>
 	);
 }

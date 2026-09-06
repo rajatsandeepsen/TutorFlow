@@ -68,7 +68,7 @@ export function InsertEquationPlugin() {
 				</TooltipTrigger>
 				<TooltipContent>{t.insertEquation}</TooltipContent>
 			</Tooltip>
-			<PopoverContent dir={dir} align="start" className="w-80">
+			<PopoverContent align="start" className="w-80">
 				<div className="flex flex-col gap-2">
 					<Input
 						dir="ltr"

@@ -89,7 +89,7 @@ export function ShortcutPlugin() {
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent dir={dir} className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>{t.keyboardShortcuts}</DialogTitle>
 				</DialogHeader>

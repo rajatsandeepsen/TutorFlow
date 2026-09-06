@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 export function Toolbar({
 	className,
 	children,
+	dir,
 	...props
 }: React.ComponentProps<"div">) {
 	return (

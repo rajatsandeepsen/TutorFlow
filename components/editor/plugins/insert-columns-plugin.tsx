@@ -66,7 +66,7 @@ export function InsertColumnsPlugin() {
 				</TooltipTrigger>
 				<TooltipContent>{t.columns}</TooltipContent>
 			</Tooltip>
-			<DropdownMenuContent dir={dir}>
+			<DropdownMenuContent>
 				{COLUMN_OPTIONS.map(({ value, labelKey }) => (
 					<DropdownMenuItem
 						key={value}

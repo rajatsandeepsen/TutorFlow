@@ -140,7 +140,6 @@ function FindReplacePanel({ context }: DecoratorComponentProps) {
 		<div
 			role="dialog"
 			aria-label={t.findAndReplace}
-			dir={dir}
 			onKeyDown={handlePanelKeyDown}
 			className="absolute end-2 top-2 z-50 flex w-80 flex-col gap-2 rounded-md border bg-popover p-2 text-popover-foreground shadow-md"
 		>

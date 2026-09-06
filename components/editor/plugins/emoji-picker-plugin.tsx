@@ -156,7 +156,6 @@ export function EmojiPickerPlugin() {
 							/>
 						</PopoverTrigger>
 						<PopoverContent
-							dir={dir}
 							side="bottom"
 							align="start"
 							sideOffset={6}

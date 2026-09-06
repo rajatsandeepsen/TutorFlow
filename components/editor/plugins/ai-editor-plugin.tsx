@@ -328,7 +328,6 @@ export function AiEditorPlugin({
 			/>
 
 			<PopoverContent
-				dir={dir}
 				ref={contentRef}
 				side="bottom"
 				align="start"

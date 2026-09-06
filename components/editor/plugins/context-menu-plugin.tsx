@@ -148,7 +148,7 @@ export function ContextMenuPlugin() {
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger ref={triggerRef} className="hidden" />
-			<ContextMenuContent dir={dir} className="w-52">
+			<ContextMenuContent className="w-52">
 				{target?.isLink && (
 					<>
 						<ContextMenuItem onClick={removeLink}>
