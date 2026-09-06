@@ -15,7 +15,6 @@ import {
 	registerEventListener,
 } from "lexical";
 import { MessageSquarePlus, SendHorizontal, Trash2 } from "lucide-react";
-import { Popover as PopoverPrimitive } from "radix-ui/popover";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -134,8 +133,6 @@ function AddCommentButton({
 				side="top"
 				align="end"
 				sideOffset={4}
-				initialFocus={false}
-				finalFocus={false}
 				className="w-auto min-w-0 rounded-full p-0.5"
 			>
 				<Button
@@ -274,7 +271,6 @@ function CommentInputBox({
 				side="bottom"
 				align="center"
 				sideOffset={12}
-				finalFocus={false}
 				className="w-72 gap-2 p-3"
 			>
 				<Textarea
@@ -351,7 +347,6 @@ function DeleteButton({
 					<Trash2 />
 				</Button>
 			</AlertDialogTrigger>
-			/>
 			<AlertDialogContent
 				dir={dir}
 				onClick={(event) => event.stopPropagation()}
@@ -526,7 +521,8 @@ function ThreadCard({
 	};
 
 	return (
-		<div
+		<button
+			type="button"
 			onClick={handleClickThread}
 			className={cn(
 				"rounded-md border bg-background p-2 text-start",
@@ -560,7 +556,7 @@ function ThreadCard({
 				))}
 			</div>
 			<ReplyComposer thread={thread} state={state} />
-		</div>
+		</button>
 	);
 }
 

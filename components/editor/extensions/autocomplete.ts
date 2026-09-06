@@ -148,9 +148,8 @@ function $search(selection: null | BaseSelection): [boolean, string] {
 	const word = [];
 	const text = node.getTextContent();
 	let i = node.getTextContentSize();
-	let c;
-	while (i-- && i >= 0 && (c = text[i]) !== " ") {
-		word.push(c);
+	while (i-- && i >= 0 && text[i] !== " ") {
+		word.push(text[i]);
 	}
 	if (word.length === 0) {
 		return [false, ""];

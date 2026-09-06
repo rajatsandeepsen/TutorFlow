@@ -35,7 +35,7 @@ const DateTimeRule = defineImportRule({
 	$import: (ctx, el, $next) => {
 		const dateTimeValue = el.getAttribute("data-lexical-datetime")!;
 		const parsedDate = Date.parse(dateTimeValue);
-		if (isNaN(parsedDate)) {
+		if (Number.isNaN(parsedDate)) {
 			return $next();
 		}
 		const node = $createDateTimeNode(new Date(parsedDate));
@@ -65,7 +65,7 @@ const GoogleDocsDateRule = defineImportRule({
 		const parsedDate =
 			(parsed.dat_df.dfie_ts?.tv?.tv_s ?? 0) * 1000 ||
 			Date.parse(parsed.dat_df.dfie_dt ?? "");
-		if (isNaN(parsedDate)) {
+		if (Number.isNaN(parsedDate)) {
 			return $next();
 		}
 		return [

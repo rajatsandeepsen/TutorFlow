@@ -333,8 +333,6 @@ export function AiEditorPlugin({
 				side="bottom"
 				align="start"
 				sideOffset={8}
-				initialFocus={false}
-				finalFocus={false}
 				aria-label={t.askAi}
 				className="w-80 min-w-0 flex-col gap-0 p-0"
 				onKeyDown={(event) => {

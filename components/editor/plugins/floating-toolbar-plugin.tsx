@@ -18,7 +18,6 @@ import {
 	registerEventListeners,
 	SELECTION_CHANGE_COMMAND,
 } from "lexical";
-import { Popover as PopoverPrimitive } from "radix-ui/popover";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	getDOMRangeRect,
@@ -169,8 +168,6 @@ function FloatingToolbar({
 				side="top"
 				align="start"
 				sideOffset={8}
-				initialFocus={false}
-				finalFocus={false}
 				role="toolbar"
 				aria-label={t.textFormatToolbar}
 				className="w-auto min-w-0 flex-row items-center gap-1 p-1"

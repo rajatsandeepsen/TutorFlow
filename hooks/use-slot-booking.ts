@@ -60,15 +60,20 @@ export type BookedSlot = {
 	endTime: Date;
 };
 
+export type BookedSlotWithoutUser = {
+	startTime: Date;
+	endTime: Date;
+};
+
 type SlotBookingState = {
 	date: Date | undefined;
 	selectedTime: string | null;
 	selectedDuration: SlotDuration;
-	bookedSlots: BookedSlot[];
+	bookedSlots: BookedSlotWithoutUser[];
 	setDate: (date: Date | undefined) => void;
 	setSelectedTime: (time: string | null) => void;
 	setSelectedDuration: (duration: SlotDuration) => void;
-	setBookedSlots: (slots: BookedSlot[]) => void;
+	setBookedSlots: (slots: BookedSlotWithoutUser[]) => void;
 };
 
 const isSameDay = (left: Date, right: Date) =>
@@ -157,7 +162,9 @@ const useSlotBookingStore = create<SlotBookingState>((set) => ({
 	setBookedSlots: (bookedSlots) => set({ bookedSlots }),
 }));
 
-export const useTeacherSlotBooking = (initialBookedSlots: BookedSlot[]) => {
+export const useTeacherSlotBooking = (
+	initialBookedSlots: BookedSlotWithoutUser[],
+) => {
 	const date = useSlotBookingStore((state) => state.date);
 	const selectedTime = useSlotBookingStore((state) => state.selectedTime);
 	const selectedDuration = useSlotBookingStore(

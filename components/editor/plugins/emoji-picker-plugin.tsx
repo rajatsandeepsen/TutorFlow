@@ -8,7 +8,6 @@ import {
 } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import compactEmojis from "emojibase-data/en/compact.json";
 import type { TextNode } from "lexical";
-import { Popover as PopoverPrimitive } from "radix-ui/popover";
 import { useCallback, useMemo, useState } from "react";
 import {
 	$createEmojiNode,
@@ -161,7 +160,6 @@ export function EmojiPickerPlugin() {
 							side="bottom"
 							align="start"
 							sideOffset={6}
-							initialFocus={false}
 							className="w-auto overflow-hidden p-0"
 						>
 							<Command

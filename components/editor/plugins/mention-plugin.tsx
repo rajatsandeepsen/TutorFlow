@@ -9,7 +9,6 @@ import {
 } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import type { TextNode } from "lexical";
 import { User } from "lucide-react";
-import { Popover as PopoverPrimitive } from "radix-ui/popover";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { $createMentionNode } from "@/components/editor/extensions/mention-node";
 import { useLanguage } from "@/components/editor/plugins/i18n-plugin";
@@ -265,7 +264,6 @@ export function MentionPlugin() {
 							side="bottom"
 							align="start"
 							sideOffset={6}
-							initialFocus={false}
 							className="w-auto overflow-hidden p-0"
 						>
 							<Command

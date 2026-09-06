@@ -7,7 +7,6 @@ import {
 import type { LexicalEditor, LexicalNode } from "lexical";
 import type { LucideIcon } from "lucide-react";
 import { Frame, MessageSquareQuote, SquarePlay, X } from "lucide-react";
-import { Popover as PopoverPrimitive } from "radix-ui/popover";
 import { useCallback } from "react";
 import { INSERT_FIGMA_COMMAND } from "@/components/editor/extensions/figma";
 import { INSERT_TWEET_COMMAND } from "@/components/editor/extensions/twitter";
@@ -133,7 +132,6 @@ export function AutoEmbedPlugin() {
 							side="bottom"
 							align="start"
 							sideOffset={6}
-							initialFocus={false}
 							className="w-auto overflow-hidden p-0"
 						>
 							<Command

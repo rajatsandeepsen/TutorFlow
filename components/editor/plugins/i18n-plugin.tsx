@@ -80,14 +80,13 @@ export function LanguageSelector({
 	value,
 	onValueChange,
 	className,
-	languages = ["en", "ar", "he"],
+	languages = ["en"],
 }: LanguageSelectorProps & {
 	className?: string;
 	languages?: Language[];
 }) {
 	return (
 		<Select
-			items={languageOptions}
 			value={value}
 			onValueChange={(value) => onValueChange(value as Language)}
 		>

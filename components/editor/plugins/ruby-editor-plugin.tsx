@@ -256,8 +256,6 @@ export function RubyEditorPlugin() {
 				side="bottom"
 				align="start"
 				sideOffset={8}
-				initialFocus={false}
-				finalFocus={false}
 				aria-label={t.insertRuby}
 				className="w-auto min-w-0 flex-row items-center gap-1.5 p-1.5"
 				onBlur={(event) => {

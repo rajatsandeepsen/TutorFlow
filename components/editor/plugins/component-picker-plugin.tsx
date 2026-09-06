@@ -7,7 +7,6 @@ import {
 	useBasicTypeaheadTriggerMatch,
 } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import type { TextNode } from "lexical";
-import { Popover as PopoverPrimitive } from "radix-ui/popover";
 import {
 	createContext,
 	useCallback,
@@ -172,7 +171,6 @@ export function ComponentPicker({ children }: { children: React.ReactNode }) {
 								side="bottom"
 								align="start"
 								sideOffset={6}
-								initialFocus={false}
 								finalFocus={false}
 								className="w-auto overflow-hidden p-0"
 							>

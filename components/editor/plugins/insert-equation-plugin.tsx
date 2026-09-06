@@ -83,8 +83,12 @@ export function InsertEquationPlugin() {
 							}
 						}}
 					/>
-					<label className="flex items-center gap-2 text-sm">
+					<label
+						htmlFor="equation-check-box"
+						className="flex items-center gap-2 text-sm"
+					>
 						<Checkbox
+							id="equation-check-box"
 							checked={inline}
 							onCheckedChange={(checked) => setInline(checked === true)}
 						/>
