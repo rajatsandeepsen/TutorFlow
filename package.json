@@ -17,11 +17,14 @@
 		"web:dev": "next dev --turbopack --port=3000",
 		"web:lint": "next lint",
 		"web:start": "next start",
+		"open:build": "opennextjs-cloudflare build",
+		"open:preview": "opennextjs-cloudflare preview",
 		"email:copy": "cp .env ./node_modules/@react-email/preview-server/",
 		"email:dev": "bun run email:copy && email dev --dir ./server/email --port 7000",
 		"email:build": "email export --out ./email/out --pretty --dir ./server/email",
 		"format": "biome format ./ --write",
-		"build": "bun run web:build"
+		"build": "bun run web:build",
+		"deploy": "bun run open:build"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.8.0",
@@ -44,6 +47,7 @@
 		"@mdx-js/loader": "^3.1.1",
 		"@mdx-js/react": "^3.1.1",
 		"@next/mdx": "^16.2.9",
+		"@opennextjs/cloudflare": "^1.20.6",
 		"@orpc/client": "^1.9.3",
 		"@orpc/server": "^1.9.3",
 		"@orpc/tanstack-query": "^1.9.3",

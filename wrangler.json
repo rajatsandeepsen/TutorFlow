@@ -2,9 +2,9 @@
 	"$schema": "node_modules/typeflare/schema.json",
 	"name": "tutorflow",
 	"compatibility_date": "2025-05-05",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 	"minify": true,
-	"main": "./server/index.ts",
+	"main": ".open-next/worker.js",
 	"observability": {
 		"enabled": true
 	},
@@ -15,7 +15,7 @@
 		"NEXT_TELEMETRY_DISABLED": true,
 	},
 	"assets": {
-		"directory": "out",
+		"directory": ".open-next/assets",
 		"binding": "ASSETS",
 		"html_handling": "auto-trailing-slash",
 		"not_found_handling": "404-page",

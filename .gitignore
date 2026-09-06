@@ -74,3 +74,6 @@ dist/
 .wrangler
 
 public/*
+
+# open-next
+.open-next
