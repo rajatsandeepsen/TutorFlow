@@ -3,10 +3,10 @@ import { studentRouter } from "./student";
 import { teacherRouter } from "./teacher";
 
 export const appRouter = {
-	healthCheck: publicProcedure.handler(() => {
+	healthCheck: publicProcedure.route({ "method": "GET" }).handler(() => {
 		return "OK";
 	}),
-	privateData: protectedProcedure.handler(({ context }) => {
+	privateData: protectedProcedure.route({ "method": "GET" }).handler(({ context }) => {
 		return {
 			message: "This is private",
 			user: context.session?.user,

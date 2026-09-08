@@ -17,39 +17,24 @@ import { api } from "@/hooks/api";
 import { MutationButton } from "@/hooks/mutation";
 
 export default function InvitePage() {
-	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 
 	const payload = {
-		name: name.trim(),
 		email: email.trim(),
 	};
 
-	const canInvite = payload.name.length > 0 && payload.email.length > 0;
+	const canInvite = payload.email.length > 0;
 
 	return (
 		<CenterContainer>
 			<Card>
 				<CardHeader>
-					<CardTitle>Add Student</CardTitle>
+					<CardTitle>Invite Student</CardTitle>
 					<CardDescription>
-						Create a student account and send their TutorFlow invite email.
+						Send an invite email with login link and join-teacher link.
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
-					<div className="space-y-2">
-						<Label htmlFor="student-name">Student name</Label>
-						<Input
-							id="student-name"
-							name="student-name"
-							type="text"
-							placeholder="e.g. Priya Sharma"
-							value={name}
-							onChange={(event) => setName(event.target.value)}
-							required
-						/>
-					</div>
-
 					<div className="space-y-2">
 						<Label htmlFor="student-email">Student email</Label>
 						<Input
@@ -69,15 +54,6 @@ export default function InvitePage() {
 								toast.error(error.message);
 							},
 						})}
-						onSuccess={(data) => {
-							toast.success(
-								data.created
-									? `Student invited: ${data.student.email}`
-									: `Student updated and invited again: ${data.student.email}`,
-							);
-							setName("");
-							setEmail("");
-						}}
 						mutate={(mutate) => (
 							<Button
 								type="button"
@@ -93,15 +69,20 @@ export default function InvitePage() {
 								Sending invite...
 							</Button>
 						}
+						isSuccess={
+							<Button type="button" className="w-full" disabled>
+								Invited
+							</Button>
+						}
 						reTry={(mutate) => (
 							<Button
 								type="button"
 								className="w-full"
-								variant="outline"
+								variant="destructive"
 								disabled={!canInvite}
 								onClick={() => mutate(payload)}
 							>
-								Try again
+								Error, Try again
 							</Button>
 						)}
 					/>

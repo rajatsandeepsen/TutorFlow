@@ -13,6 +13,7 @@ export const createAuth = (baseURL: string, waitUntil: WaitUntil) =>
 	betterAuth({
 		secret: env.AUTH_SECRET,
 		baseURL,
+		basePath: "/api/auth",
 		session: {
 			cookieCache: {
 				enabled: true,
@@ -36,7 +37,7 @@ export const createAuth = (baseURL: string, waitUntil: WaitUntil) =>
 					type: ["student", "teacher"],
 					required: true,
 					defaultValue: "teacher",
-					input: false,
+					input: true,
 				},
 			},
 		},

@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, gte, ilike, inArray, lt, lte } from "drizzle-orm";
+import { and, desc, eq, gt, gte, ilike, inArray, lt, lte, or } from "drizzle-orm";
 import { z } from "zod";
 import { sendEmail } from "@/server/context/email";
 import { user } from "@/server/db/schema/auth";
@@ -16,12 +16,10 @@ import { getError, teacherProcedure, tryAPI } from "./procedure";
 
 const toTimeText = (date: Date) => date.toISOString();
 
-const getSignInLink = (req: Request, email: string, nextPath?: string) => {
-	const url = new URL("/auth/sign-in", req.url);
+const getSignInLink = (req: Request, email: string, path: string) => {
+	const url = new URL("/login", req.url);
+	url.searchParams.set("redirect_to", path);
 	url.searchParams.set("email", email);
-	if (nextPath) {
-		url.searchParams.set("next", nextPath);
-	}
 	return url.toString();
 };
 
@@ -131,88 +129,22 @@ export const teacherRouter = {
 	createStudentAccount: teacherProcedure
 		.input(
 			z.object({
-				name: z.string().min(1),
-				email: z.string().email(),
-				inviteLink: z.string().url().optional(),
+				email: z.email(),
 			}),
 		)
 		.handler(async ({ context, input }) => {
-			const existing = await tryAPI(
-				"teacher.createStudentAccount.findExistingUser",
-				context.db.query.user.findFirst({
-					where: eq(user.email, input.email),
-					columns: { id: true, name: true, email: true, role: true },
-				}),
-			);
-
-			if (existing && existing.role !== "student") {
-				throw getError("CONFLICT", "A teacher account already uses this email");
-			}
-
-			const inviteLink =
-				input.inviteLink ?? getSignInLink(context.req, input.email, "/profile");
-
-			if (existing) {
-				const [updatedStudent] = await tryAPI(
-					"teacher.createStudentAccount.updateExistingStudent",
-					context.db
-						.update(user)
-						.set({ name: input.name })
-						.where(eq(user.id, existing.id))
-						.returning({
-							id: user.id,
-							name: user.name,
-							email: user.email,
-							role: user.role,
-						}),
-				);
-
-				context.waitUntil(
-					sendEmail({
-						to: updatedStudent.email,
-						subject: "You're invited to TutorFlow",
-						jsx: StudentAccountCreatedEmail({
-							studentName: updatedStudent.name,
-							tutorName: context.user.name,
-							inviteLink,
-						}),
-					}),
-				);
-
-				return { student: updatedStudent, created: false };
-			}
-
-			const [createdStudent] = await tryAPI(
-				"teacher.createStudentAccount.insertStudent",
-				context.db
-					.insert(user)
-					.values({
-						id: crypto.randomUUID(),
-						name: input.name,
-						email: input.email,
-						role: "student",
-					})
-					.returning({
-						id: user.id,
-						name: user.name,
-						email: user.email,
-						role: user.role,
-					}),
-			);
-
 			context.waitUntil(
 				sendEmail({
-					to: createdStudent.email,
+					to: input.email,
 					subject: "You're invited to TutorFlow",
 					jsx: StudentAccountCreatedEmail({
-						studentName: createdStudent.name,
-						tutorName: context.user.name,
-						inviteLink,
+						teacherId: context.user.id,
+						teacherName: context.user.name,
 					}),
 				}),
 			);
 
-			return { student: createdStudent, created: true };
+			return;
 		}),
 
 	createSession: teacherProcedure
@@ -584,7 +516,14 @@ export const teacherRouter = {
 						),
 					)
 					.where(
-						and(eq(user.role, "student"), ilike(user.name, `%${input.query}%`)),
+						and(
+							eq(user.role, "student"),
+							or(
+								eq(user.id, input.query),
+								ilike(user.name, `%${input.query}%`),
+								ilike(user.email, `%${input.query}%`),
+							),
+						),
 					)
 					.orderBy(user.name)
 					.limit(input.limit ?? 20),

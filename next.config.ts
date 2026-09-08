@@ -10,6 +10,7 @@ if (env.NODE_ENV === "production") {
 const nextConfig: NextConfig = {
 	pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
 	trailingSlash: true,
+	skipTrailingSlashRedirect: true,
 	images: { unoptimized: true },
 	turbopack: {
 		rules: {

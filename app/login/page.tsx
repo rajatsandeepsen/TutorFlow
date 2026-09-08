@@ -13,11 +13,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { authClient } from "@/hooks/auth";
 
 function SignUpFields() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [role, setRole] = useState("teacher");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -32,6 +34,7 @@ function SignUpFields() {
 				name: email.split("@")[0],
 				email,
 				password,
+				role: role as 'teacher',
 			},
 			{
 				onSuccess: () => {
@@ -64,6 +67,13 @@ function SignUpFields() {
 					value={password}
 					onChange={(e) => setPassword(e.target.value)}
 				/>
+			</div>
+			<div className="space-y-2">
+				<Label htmlFor="sign-up-password">Role</Label>
+				<ToggleGroup value={role} onValueChange={setRole} type="single">
+					<ToggleGroupItem value="teacher">Teacher</ToggleGroupItem>
+					<ToggleGroupItem value="student">Student</ToggleGroupItem>
+				</ToggleGroup>
 			</div>
 			<Button
 				type="submit"
@@ -140,8 +150,8 @@ export default function LoginPage() {
 	return (
 		<Tabs defaultValue="sign-up">
 			<TabsList className="grid w-full grid-cols-2">
-				<TabsTrigger value="sign-up">Sign Up</TabsTrigger>
-				<TabsTrigger value="sign-in">Sign In</TabsTrigger>
+				<TabsTrigger value="sign-up">New Account</TabsTrigger>
+				<TabsTrigger value="sign-in">Login In</TabsTrigger>
 			</TabsList>
 
 			<TabsContent value="sign-up">

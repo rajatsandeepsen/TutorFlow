@@ -28,6 +28,58 @@ export const studentRouter = {
 		};
 	}),
 
+	joinTeacher: studentProcedure
+		.input(
+			z.object({
+				teacherId: z.string().min(1),
+			}),
+		)
+		.handler(async ({ context, input }) => {
+			const teacher = await tryAPI(
+				"student.joinTeacher.findTeacher",
+				context.db.query.user.findFirst({
+					where: and(eq(user.id, input.teacherId), eq(user.role, "teacher")),
+					columns: { id: true },
+				}),
+			);
+
+			if (!teacher) {
+				throw getError("NOT_FOUND", "Teacher not found");
+			}
+
+			const existingProfile = await tryAPI(
+				"student.joinTeacher.findExistingProfile",
+				context.db.query.studentProfile.findFirst({
+					where: and(
+						eq(studentProfile.studentId, context.user.id),
+						eq(studentProfile.teacherId, input.teacherId),
+					),
+				}),
+			);
+
+			if (existingProfile) {
+				return { profile: existingProfile, joined: false };
+			}
+
+			const [createdProfile] = await tryAPI(
+				"student.joinTeacher.createProfile",
+				context.db
+					.insert(studentProfile)
+					.values({
+						studentId: context.user.id,
+						teacherId: input.teacherId,
+						name: context.user.name,
+						subject: "General",
+						currentLevel: "Not specified",
+						learningGoals: "Not specified",
+						weakAreas: "Not specified",
+					})
+					.returning(),
+			);
+
+			return { profile: createdProfile, joined: true };
+		}),
+
 	updateMyBasicProfile: studentProcedure
 		.input(
 			z.object({

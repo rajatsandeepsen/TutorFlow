@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -49,12 +50,25 @@ const parseStartTime = (date: Date, time: string) => {
 export default function Page() {
 	const params = useParams<{ studentId?: string }>();
 	const [studentIdInput, setStudentIdInput] = useState("");
+	const [studentSearchQuery, setStudentSearchQuery] = useState("");
 	const [topic, setTopic] = useState("");
 	const [description, setDescription] = useState("");
 	const [joinLink, setJoinLink] = useState("");
 	const [activeTimePeriod, setActiveTimePeriod] = useState("morning");
+	const [createdSessionId, setCreatedSessionId] = useState("");
 
 	const studentId = (params.studentId ?? studentIdInput).trim();
+	const normalizedStudentSearchQuery = studentSearchQuery.trim();
+
+	const studentsQuery = useQuery({
+		queryKey: ["teacher", "students", normalizedStudentSearchQuery],
+		enabled: normalizedStudentSearchQuery.length > 0,
+		queryFn: () =>
+			client.teacher.searchStudentsByName({
+				query: normalizedStudentSearchQuery,
+				limit: 10,
+			}),
+	});
 
 	const slotsQuery = useQuery({
 		queryKey: ["teacher", "slots", "for-scheduling"],
@@ -98,7 +112,7 @@ export default function Page() {
 		const startTime = parseStartTime(date, selectedTime);
 		const durationMinutes =
 			DURATION_TO_MINUTES[
-				selectedDuration as keyof typeof DURATION_TO_MINUTES
+			selectedDuration as keyof typeof DURATION_TO_MINUTES
 			] ?? 60;
 		const endTime = new Date(startTime);
 		endTime.setMinutes(endTime.getMinutes() + durationMinutes);
@@ -132,6 +146,50 @@ export default function Page() {
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-4 p-4">
+				<div className="space-y-2">
+					<Label htmlFor="student-search">Search student</Label>
+					<Input
+						id="student-search"
+						value={studentSearchQuery}
+						onChange={(event) => setStudentSearchQuery(event.target.value)}
+						placeholder="e.g. Aarav"
+					/>
+					{normalizedStudentSearchQuery.length === 0 ? (
+						<p className="text-muted-foreground text-xs">
+							Type a student name to search and select one.
+						</p>
+					) : studentsQuery.data?.length === 0 ? (
+						<p className="text-muted-foreground text-xs">No students found.</p>
+					) : (
+						<div className="grid gap-2 pt-2">
+							{studentsQuery.data?.map((student) => (
+								<div
+									key={student.id}
+									className="flex flex-col gap-2 rounded-md border p-3 md:flex-row md:items-center md:justify-between"
+								>
+									<div className="min-w-0">
+										<p className="truncate font-medium text-sm">{student.name}</p>
+										<p className="truncate text-muted-foreground text-xs">
+											{student.email}
+										</p>
+									</div>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={() => {
+											setStudentIdInput(student.id);
+											setStudentSearchQuery(student.name);
+										}}
+									>
+										Select
+									</Button>
+								</div>
+							))}
+						</div>
+					)
+					}
+				</div>
 				<div className="grid gap-4 md:grid-cols-2">
 					<div className="space-y-2">
 						<Label htmlFor="student-id">Student ID</Label>
@@ -258,6 +316,13 @@ export default function Page() {
 			</CardContent>
 			<CardFooter className="flex flex-col gap-4 border-t md:flex-row md:items-center">
 				<p className="text-muted-foreground text-sm">{bookingStatusMessage}</p>
+				{createdSessionId && (
+					<Button asChild variant="secondary" className="w-full md:w-auto">
+						<Link href={`/teacher/session/${createdSessionId}`}>
+							Open session hub
+						</Link>
+					</Button>
+				)}
 				<MutationButton
 					api={api.teacher.createSession.mutationOptions({
 						onError: (error) => {
@@ -268,6 +333,7 @@ export default function Page() {
 						toast.success(
 							`Session scheduled for ${new Date(data.startTime).toLocaleString()}`,
 						);
+						setCreatedSessionId(data.id);
 						setTopic("");
 						setDescription("");
 						setJoinLink("");
