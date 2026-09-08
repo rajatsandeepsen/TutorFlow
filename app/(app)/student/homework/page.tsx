@@ -45,7 +45,7 @@ export default function Page() {
 									</div>
 								</div>
 								<Button asChild size="sm">
-									<Link href={`/student/homework/${homework.id}`}>
+									<Link href={`/student/sessions/${homework.slotId}/homework/${homework.id}`}>
 										{homework.anwser ? "Update answer" : "Answer"}
 									</Link>
 								</Button>

@@ -126,6 +126,89 @@ const updateStudentExtraProfileProcedure = teacherProcedure
 	});
 
 export const teacherRouter = {
+	getSidebarSummary: teacherProcedure.handler(async ({ context }) => {
+		const [recentSessions, recentHomeworks, recentNotes, recentStudents] = await Promise.all([
+			tryAPI(
+				"teacher.getSidebarSummary.recentSessions",
+				context.db
+					.select({
+						id: slot.id,
+						studentId: slot.studentId,
+						studentName: user.name,
+						topic: slot.topic,
+						status: slot.status,
+						startTime: slot.startTime,
+						endTime: slot.endTime,
+					})
+					.from(slot)
+					.innerJoin(user, eq(user.id, slot.studentId))
+					.where(eq(slot.teacherId, context.user.id))
+					.orderBy(desc(slot.startTime))
+					.limit(5),
+			),
+			tryAPI(
+				"teacher.getSidebarSummary.recentHomeworks",
+				context.db
+					.select({
+						id: homeworks.id,
+						slotId: homeworks.slotId,
+						question: homeworks.question,
+						topic: slot.topic,
+						studentName: user.name,
+						createdAt: homeworks.createdAt,
+					})
+					.from(homeworks)
+					.innerJoin(slot, eq(slot.id, homeworks.slotId))
+					.innerJoin(user, eq(user.id, slot.studentId))
+					.where(eq(slot.teacherId, context.user.id))
+					.orderBy(desc(homeworks.createdAt))
+					.limit(5),
+			),
+			tryAPI(
+				"teacher.getSidebarSummary.recentNotes",
+				context.db
+					.select({
+						id: notes.id,
+						slotId: notes.slotId,
+						text: notes.text,
+						topic: slot.topic,
+						studentName: user.name,
+						createdAt: notes.createdAt,
+					})
+					.from(notes)
+					.innerJoin(slot, eq(slot.id, notes.slotId))
+					.innerJoin(user, eq(user.id, slot.studentId))
+					.where(eq(slot.teacherId, context.user.id))
+					.orderBy(desc(notes.createdAt))
+					.limit(5),
+			),
+			tryAPI(
+				"teacher.getSidebarSummary.recentStudents",
+				context.db
+					.select({
+						id: studentProfile.studentId,
+						name: user.name,
+						email: user.email,
+						subject: studentProfile.subject,
+						currentLevel: studentProfile.currentLevel,
+						updatedAt: studentProfile.updatedAt,
+					})
+					.from(studentProfile)
+					.innerJoin(user, eq(user.id, studentProfile.studentId))
+					.where(eq(studentProfile.teacherId, context.user.id))
+					.orderBy(desc(studentProfile.updatedAt))
+					.limit(5),
+			),
+		]);
+
+		return {
+			recentSessions,
+			recentHomeworks,
+			recentNotes,
+			recentStudents,
+		};
+	}),
+
 	createStudentAccount: teacherProcedure
 		.input(
 			z.object({

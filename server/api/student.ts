@@ -7,6 +7,64 @@ import { studentProfile } from "@/server/db/schema/student";
 import { getError, studentProcedure, tryAPI } from "./procedure";
 
 export const studentRouter = {
+	getSidebarSummary: studentProcedure.handler(async ({ context }) => {
+		const [recentSessions, recentHomeworks, recentNotes] = await Promise.all([
+			tryAPI(
+				"student.getSidebarSummary.recentSessions",
+				context.db
+					.select({
+						id: slot.id,
+						teacherName: user.name,
+						topic: slot.topic,
+						status: slot.status,
+						startTime: slot.startTime,
+						endTime: slot.endTime,
+					})
+					.from(slot)
+					.innerJoin(user, eq(user.id, slot.teacherId))
+					.where(eq(slot.studentId, context.user.id))
+					.orderBy(desc(slot.startTime))
+					.limit(5),
+			),
+			tryAPI(
+				"student.getSidebarSummary.recentHomeworks",
+				context.db
+					.select({
+						id: homeworks.id,
+						slotId: homeworks.slotId,
+						question: homeworks.question,
+						topic: slot.topic,
+						score: homeworks.score,
+						anwser: homeworks.anwser,
+						createdAt: homeworks.createdAt,
+					})
+					.from(homeworks)
+					.innerJoin(slot, eq(slot.id, homeworks.slotId))
+					.where(eq(slot.studentId, context.user.id))
+					.orderBy(desc(homeworks.createdAt))
+					.limit(5),
+			),
+			tryAPI(
+				"student.getSidebarSummary.recentNotes",
+				context.db
+					.select({
+						id: notes.id,
+						slotId: notes.slotId,
+						text: notes.text,
+						topic: slot.topic,
+						createdAt: notes.createdAt,
+					})
+					.from(notes)
+					.innerJoin(slot, eq(slot.id, notes.slotId))
+					.where(eq(slot.studentId, context.user.id))
+					.orderBy(desc(notes.createdAt))
+					.limit(5),
+			),
+		]);
+
+		return { recentSessions, recentHomeworks, recentNotes };
+	}),
+
 	getMyProfile: studentProcedure.handler(async ({ context }) => {
 		const profiles = await tryAPI(
 			"student.getMyProfile.findProfiles",

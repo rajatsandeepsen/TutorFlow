@@ -40,7 +40,9 @@ export default function Page() {
 									<p className="line-clamp-2 text-sm">{note.text}</p>
 								</div>
 								<Button asChild variant="outline" size="sm">
-									<Link href={`/student/notes/${note.id}`}>Open</Link>
+									<Link href={`/student/sessions/${note.slotId}/notes/${note.id}`}>
+										Open
+									</Link>
 								</Button>
 							</CardContent>
 						</Card>

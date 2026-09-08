@@ -28,7 +28,7 @@ export default function Page() {
 	}, [slotsQuery.data, slotId]);
 
 	const sessionLinks = [
-		{ label: "Open notes", href: `/teacher/notes/${slotId}`, variant: "default" as const },
+		{ label: "Open notes", href: `/teacher/session/${slotId}/notes`, variant: "default" as const },
 		{ label: "Open calendar", href: "/teacher/calender", variant: "outline" as const },
 		{ label: "Back to slot booking", href: "/teacher/slot", variant: "outline" as const },
 		{
